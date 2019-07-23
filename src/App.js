@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
-
+import {Icon} from 'antd'
 class App  extends Component {
 
   constructor (props) {
@@ -10,7 +10,7 @@ class App  extends Component {
     this.state = {
 
     board : Array(64).fill(<img src ="https://www.tattooforaweek.com/images/question-mark-temporary-tattoo-jb.jpg" width = "25px" height="60px"/>),
-    data : Array.apply(null, Array(8)).map(function() { return Math.floor(Math.random() * 63 % 100); }),
+    data : Array.apply(null, Array(8)).map(function() { return Math.floor(Math.random() * 64); }),
     arr: [],
     obj:{},
     diamond_co_ordinate:[],
@@ -19,7 +19,14 @@ class App  extends Component {
     index_data:[],
     row:0,
     column:0,
-    index_to_remove:-1
+    index_to_remove:-1, 
+    count:0,
+    totalScore:0,
+    left: 0 ,
+    right: 0,
+    up: 0,
+    down:0,
+    count_diamond:0
     
     }
 
@@ -30,9 +37,12 @@ handleClick = (index)=>{
 
 
 
+
+console.log(this.state.data)
+
 let index_row =  Math.ceil((index+1)/8);
 let index_column = Math.floor(index % 8)+1;
-
+console.log("index_row" + index_row , "index_column" +  index_column);
 
 let index_data = [];
 
@@ -97,11 +107,11 @@ let ob = {};
 
 //finding the diamond co-ordinate
 
-this.state.data.map( data=>{
+this.state.data.map( (data, index)=>{
 
   
   diamond_co_ordinate.push({
-     
+     key:index,
      row:Math.ceil((data+1)/8),
      column :Math.floor(data % 8)+1
   });
@@ -120,6 +130,7 @@ console.log(diamond_co_ordinate);
 
     let flag = data.find(  (element) =>{
       return element === index;
+
     })
 
    if(flag){
@@ -137,7 +148,9 @@ if(this.state.board[index] != "Diamond"){
 // index_data.push(index);
 
 let data = this.state.board;
+if(this.state.board[index] != "Diamond"){
 data[this.state.index_to_remove] = "";
+}
 
 this.setState({
 
@@ -145,14 +158,15 @@ this.setState({
   board:data
 }) 
 
+
 }
 
 let position = [];
 
 let distance = 100000;
 
-let x_co = 0;
-let y_co = 0;
+let x_co;
+let y_co;
 
 //finding the minimum distance
 
@@ -161,18 +175,17 @@ let pos;
  diamond_co_ordinate.map( (data, key) =>{
 
 
-    let x = Math.abs ( data.row - Math.ceil( (index+1)/8) );
+    let x = Math.abs ( data.row - (Math.ceil( (index+1)/8)) );
     let y = Math.abs ( data.column  - (Math.floor(index%8) +1 ));
 
-    let c = Math.abs(Math.sqrt( x*x + y*y));
+    let c = Math.sqrt( x*x + y*y);
      position.push(c);
 
-     if(c < distance) {
+     if(c <= distance) {
 
        pos = key;
        distance = c;
        x_co = data.row;
-       
        y_co = data.column;
      }
 
@@ -185,7 +198,7 @@ let pos;
 
    //console.log(diamond_co_ordinate.splice(pos, 1));
 
-   console.log(pos);
+   console.log("position is :" + pos);
    console.log(x_co, y_co)
 
    console.log(position);
@@ -195,7 +208,7 @@ let pos;
 //arrows pointing 
 
 
-
+let count_diamond = this.state.count_diamond;
 
 if(  (Math.abs ( x_co - r ) < Math.abs(y_co - cc) ) || x_co === r )
 {
@@ -204,53 +217,76 @@ if(  (Math.abs ( x_co - r ) < Math.abs(y_co - cc) ) || x_co === r )
   if(y_co - cc <  0)
   {
     if(final[index] != "Diamond"){
-      final[index] = "left";
+      final[index] = <Icon type = "arrow-left"/>;
     }
     
-    // else{
-    //   for(var i = 0;i<l-1;i++ ){
-    //     final[index_data[i]] = "";
-    //    }
-    // }
+    else{
+     final[index] = <Icon type = "sketch"/>
+     count_diamond ++;
+      let data = this.state.data;
+      data.splice(pos, 1);
+      this.setState({
+        data:data
+      })
+    }
     
   }
 
   else{
-    if(final[index] != "Diamond"){
-      final[index] = "right";
-    }
-    // else{
-    //    for(var i = 0;i<l-1;i++ ){
+             if(final[index] != "Diamond"){
+            final[index] = <Icon type = "arrow-right"/>;
+              }
 
-    //     final[index_data[i]] = "";
-    //    }
-    // }
+           else{
+             final[index] = <Icon type = "sketch"/>
+             count_diamond++;
+              let data = this.state.data;
+              data.splice(pos, 1);
+              this.setState({
+              data:data
+      })
+    }
   }
 }
 
 else{
-  if(x_co - r > 0 ){
+
+  if(x_co - r < 0 ){
+    
 
     if(final[index] != "Diamond"){
-      final[index] = "UP";
+      final[index] = <Icon type = "arrow-up"/>;
     }
-    // else{
-    //   for(var i = 0;i<l-1;i++ ){
+    
+    else{
+     final[index] = <Icon type = "sketch"/>
+     count_diamond++;
+      let data = this.state.data;
+      data.splice(pos, 1);
+      this.setState({
+        data:data
+      })
+    }
 
-    //     final[index_data[i]] = "";
-    //    }
-    // }
   }
+
   else
   {
     if(final[index] != "Diamond"){
-      final[index] = "Down";
+      final[index] = <Icon type = "arrow-down"/>;
+
     }
-    // else{
-    //   for(var i = 0;i<l-1;i++ ){
-    //     final[index_data[i]] = "";
-    //    }
-    // }
+
+
+    else{
+     final[index] = <Icon type = "sketch"/>
+     count_diamond++;
+      let data = this.state.data;
+      data.splice(pos, 1);
+      this.setState({
+        data:data
+      })
+    }
   }
 }
 
@@ -261,16 +297,51 @@ else{
       board:c,
       arr:arr,
       board:final,
-      index_data:index_data
+      index_data:index_data,
+      count_diamond:count_diamond
       
       
     })
-  
 
+ let count = 0;
+
+ this.state.board.map( item =>{
+   if(item === ""){
+     count++;
+   }
+ })
+ this.setState({
+   count:count
+ })
+
+
+
+
+// this.state.board.map( item =>{
+//   if(item === "Diamond" ){
+//     count_diamond++;
+//   }
+// })
+
+console.log("count diamond is " + count_diamond);
+
+if(count_diamond == 8){
+
+  alert("Game Over");
+ 
+  localStorage.setItem("count", JSON.stringify(this.state.count))
+
+    const  count = localStorage.getItem("count")
+
+   {console.log("Count value is as " + count)};
+
+}
 
   }
 
+
   render(){
+
     const Box = this.state.board.map( (box, index) => 
 
       <div className="box"  key = {index} onClick = { ()=> this.handleClick(index) }>{box}</div>)
@@ -279,6 +350,8 @@ else{
       let c = Math.floor(Math.random() * 8);
     
       let count = 0;
+      let count_top_score=0;
+       count_top_score = localStorage.getItem("count")
 
 
   return (
@@ -286,12 +359,17 @@ else{
 
 
     <div className="App">
-     
-   {<h2>Your Score:<h2> count}
-     
-     {this.state.board.map( item =>{
-         item === "" ?count++ : null;
-     })}
+
+
+    
+     {<h3> Total Score</h3>}
+     {56 - this.state.count}
+
+     <div className="container">
+         <h3>Top Scorer </h3>
+         
+         {56 - count_top_score}
+      </div>
 
    <div className="container">
      
