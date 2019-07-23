@@ -1,0 +1,20 @@
+.App {
+  text-align: center;
+}
+
+.container{
+  text-align: center;
+  align-content: center;
+}
+.box{
+  width: 65px;
+  height: 65px;
+  border: 1px solid black;
+  display: inline-block;
+}
+
+.board{
+	display: inline-flex;
+	flex-wrap:wrap;
+	width: 600px;
+}
